@@ -9,6 +9,18 @@ const app = new App({
   logLevel: LogLevel.DEBUG,
 });
 
+try {
+  const result =  app.client.conversations.create({
+    name: "testing-up",
+    is_private: false,
+  });
+
+  // The result will include information like the ID of the conversation
+  console.log(result);
+}
+catch (error) {
+  console.error(error);
+}
 /* Add functionality here */
 app.event('app_home_opened', async ({ event, client, context }) => {
   try {
@@ -38,7 +50,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: "This button won't do much for now but you can set up a listener for it using the `actions()` method and passing its unique `action_id`. See an example in the `examples` folder within your Bolt app.",
+              text: "Checking update status success!",
             },
           },
           {
@@ -61,6 +73,8 @@ app.event('app_home_opened', async ({ event, client, context }) => {
   }
 });
 
+
+
 app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say({
@@ -70,14 +84,6 @@ app.message('hello', async ({ message, say }) => {
         text: {
           type: 'mrkdwn',
           text: `Hey there <@${message.user}>!`,
-        },
-        accessory: {
-          type: 'button',
-          text: {
-            type: 'plain_text',
-            text: 'Click Me',
-          },
-          action_id: 'button_click',
         },
       },
     ],
