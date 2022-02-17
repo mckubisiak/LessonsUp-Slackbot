@@ -1,13 +1,59 @@
 require('dotenv').config();
 const { App, LogLevel } = require('@slack/bolt');
 
+// const database = 'https://rchcbvcmpbzjlmxxwgfa.supabase.co';
+
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  token: process.env.SLACK_BOT_TOKEN,
-  socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  stateSecret: 'my-secret',
+  // token: process.env.SLACK_APP_TOKEN,
   logLevel: LogLevel.DEBUG,
+  scopes:  ['chat:write', 'chat:write.customize','commands','team:read','groups:read','workflow.steps:execute','incoming-webhook','groups:history'], 
+  // installerOptions: {
+  //   // directInstall: true,
+  // },
+  // installationStore: {
+  //   storeInstallation: async (installation) => {
+  //     // change the lines below so they save to your database
+  //     if (installation.isEnterpriseInstall && installation.enterprise !== undefined) {
+  //       // support for org-wide app installation
+  //       return await database.set(installation.enterprise.id, installation);
+  //     }
+  //     if (installation.team !== undefined) {
+  //       // single team app installation
+  //       return await database.set(installation.team.id, installation);
+  //     }
+  //     throw new Error('Failed saving installation data to installationStore');
+  //   },
+  //   fetchInstallation: async (installQuery) => {
+  //     // change the lines below so they fetch from your database
+  //     if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
+  //       // org wide app installation lookup
+  //       return await database.get(installQuery.enterpriseId);
+  //     }
+  //     if (installQuery.teamId !== undefined) {
+  //       // single team app installation lookup
+  //       return await database.get(installQuery.teamId);
+  //     }
+  //     throw new Error('Failed fetching installation');
+  //   },
+  //   deleteInstallation: async (installQuery) => {
+  //     // change the lines below so they delete from your database
+  //     if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
+  //       // org wide app installation deletion
+  //       return await database.delete(installQuery.enterpriseId);
+  //     }
+  //     if (installQuery.teamId !== undefined) {
+  //       // single team app installation deletion
+  //       return await database.delete(installQuery.teamId);
+  //     }
+  //     throw new Error('Failed to delete installation');
+  //   },
+  // },
 });
+
 
 /* Add functionality here */
 app.event('app_home_opened', async ({ event, client, context }) => {
@@ -38,7 +84,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: "This button won't do much for now but you can set up a listener for it using the `actions()` method and passing its unique `action_id`. See an example in the `examples` folder within your Bolt app.",
+              text: "Veryifying connection status success!",
             },
           },
           {
