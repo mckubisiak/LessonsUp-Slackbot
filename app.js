@@ -7,20 +7,24 @@ const app = new App({
   socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN,
   logLevel: LogLevel.DEBUG,
+  // redirectUri: 'https://hook.integromat.com/qg8ngnecdmgdsq7yhdhzp6kt8hpdqc3h/slack/redirect', 
+  // installerOptions: {
+  //   redirectUriPath: '/slack/redirect', 
+  // },
 });
 
-try {
-  const result =  app.client.conversations.create({
-    name: "testing-up",
-    is_private: false,
-  });
+// try {
+//   const result =  app.client.conversations.create({
+//     name: "testing-up",
+//     is_private: false,
+//   });
 
-  // The result will include information like the ID of the conversation
-  console.log(result);
-}
-catch (error) {
-  console.error(error);
-}
+//   // The result will include information like the ID of the conversation
+//   console.log(result);
+// }
+// catch (error) {
+//   console.error(error);
+// }
 /* Add functionality here */
 app.event('app_home_opened', async ({ event, client, context }) => {
   try {
