@@ -75,21 +75,21 @@ base('Accept/Reject Links').select({
 
 /* Add functionality here */
 
-// ID of the channel you want to send the message to
-const channelId = "C12345";
+// // ID of the channel you want to send the message to
+// const channelId = "C12345";
 
-try {
-  // Call the chat.postMessage method using the WebClient
-  const result = await client.chat.postMessage({
-    channel: channelId,
-    text: "Hello world"
-  });
+// try {
+//   // Call the chat.postMessage method using the WebClient
+//   const result = await client.chat.postMessage({
+//     channel: channelId,
+//     text: "Hello world"
+//   });
 
-  console.log(result);
-}
-catch (error) {
-  console.error(error);
-}
+//   console.log(result);
+// }
+// catch (error) {
+//   console.error(error);
+// }
 
 
 app.message('eomjis test?!', async ({ message, client, logger }) => {
