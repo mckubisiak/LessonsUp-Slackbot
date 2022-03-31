@@ -2,7 +2,7 @@ require('dotenv').config();
 const { App, LogLevel } = require('@slack/bolt');
 const { FileInstallationStore } = require('@slack/oauth');
 // const bodyParser = require('body-parser');
-const express = require('express');
+// const express = require('express');
 
 const app = new App({
   // token: process.env.SLACK_BOT_TOKEN,

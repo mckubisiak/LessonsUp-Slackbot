@@ -1,3 +1,4 @@
+require('dotenv').config();
 
 const Airtable = require('airtable');
 const base = new Airtable({apiKey: process.env.AIRTABLE_API_KEY}).base('app0V3hWyGAV40fQE');
@@ -12,18 +13,18 @@ base('Accept/Reject Links').select({
 }).eachPage(function page(records, fetchNextPage) {
   
   records.forEach(function(record) {
-    // console.log('Retrieved Talent Name', record.get('Talent Name'));
-    // console.log('Retrieved Talent Linkedin', record.get('Talent Linkedin'));
-    //   console.log('Retrieved job_title', record.get('job_title'));
-    //   console.log('Retrieved Talent Subroles', record.get('Talent Subroles'));
-    //   console.log('Retrieved Jobs Subroles', record.get('Jobs Subroles'));
-    //   console.log('Retrieved accept_link', record.get('accept_link'));
-    //   console.log('Retrieved reject_link', record.get('reject_link'));
-    //   console.log('Retrieved Talent Resume Link', record.get('Talent Resume Link'));
-    //   console.log('Retrieved Talent Experience', record.get('Talent Experience'));
-      // console.log('Retrieved Message BELOW -------------------------------------------------------------------------------------------------------');
-      // console.log(typeof record.get('Message'));
-      // filledMessage = record.get('Message')
+    console.log('Retrieved Talent Name', record.get('Talent Name'));
+    console.log('Retrieved Talent Linkedin', record.get('Talent Linkedin'));
+      console.log('Retrieved job_title', record.get('job_title'));
+      console.log('Retrieved Talent Subroles', record.get('Talent Subroles'));
+      console.log('Retrieved Jobs Subroles', record.get('Jobs Subroles'));
+      console.log('Retrieved accept_link', record.get('accept_link'));
+      console.log('Retrieved reject_link', record.get('reject_link'));
+      console.log('Retrieved Talent Resume Link', record.get('Talent Resume Link'));
+      console.log('Retrieved Talent Experience', record.get('Talent Experience'));
+      console.log('Retrieved Message BELOW -------------------------------------------------------------------------------------------------------');
+      console.log(record.get('Message'));
+      filledMessage = record.get('Message')
       return filledMessage;
     });
     console.log(businessMessage);
