@@ -1,7 +1,10 @@
 require('dotenv').config();
-const { App, LogLevel, ExpressReceiver } = require('@slack/bolt');
+const { App, LogLevel } = require('@slack/bolt');
 const { FileInstallationStore } = require('@slack/oauth');
-const receiver = new ExpressReceiver({
+// const bodyParser = require('body-parser');
+const express = require('express');
+
+const app = new App({
   // token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
@@ -33,16 +36,36 @@ const receiver = new ExpressReceiver({
   installerOptions: {
     directInstall: false,
   },
-});
-const express = require('express');
-const bodyParser = require('body-parser');
-
-const app = new App({
-  receiver,
-});
-
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(express.json());
+  customRoutes: [
+    {
+      path: '/get-test',
+      method: ['POST'],
+      handler: (req, res) => {
+        // app.use(express.urlencoded({ extended: false }));
+        // app.use(express.json());
+      
+        // let request = JSON.parse(req.body);
+        //   let payload = {
+          //     "message": request.message,
+          //     "accept_link": request.accept_link,
+          //     "reject_link": request.reject_link
+          
+          // }
+          res.writeHead(200);
+          console.log(req);
+          
+          // console.log('ROUTE REQUEST HERE-------------', req);
+          console.log('ROUTE REQUEST body HERE-------------', req.body);
+          // console.log('parsed REQUEST body HERE-------------', request);
+          res.end('res end');
+        },
+      },
+    ],
+  });
+  
+  
+  app.use(express.urlencoded({extended: false}));
+  app.use(express.json());
 
 /* Add functionality here */
 
@@ -85,31 +108,19 @@ app.event('app_home_opened', async ({ event, client, context }) => {
   }
 });
 
-// receiver.router.use(express.json());
-receiver.router.use(bodyParser.urlencoded({ extended: true }));
+// const channelId = "C032E5YCF4J";
+// const channelId = 'C031LN082QP';
 
-receiver.router.post('/get-test', (req, res) => {
-  let request = req.body;
-
-  // const channelId = "C032E5YCF4J";
-  const channelId = 'C031LN082QP';
-
-  try {
-    // Call the chat.postMessage method using the WebClient
-    const result = app.client.chat.postMessage({
-      channel: 'C031LN082QP',
-      text: req.body.message,
-    });
-
-    console.log(result);
-  } catch (error) {
-    console.error(error);
-  }
-  // console.log('reciever REQUEST HERE-------------',req);
-  console.log('reciever REQUEST body HERE-------------', request);
-  console.log('yay');
-  res.send('yay!');
-});
+// try {
+//   // Call the chat.postMessage method using the WebClient
+//   const result = app.client.chat.postMessage({
+//     channel: 'C031LN082QP',
+//     text: req.body.message,
+//   });
+//   console.log(result);
+// } catch (error) {
+//   console.error(error);
+// }
 
 (async () => {
   await app.start(process.env.PORT || 3000);
