@@ -4,9 +4,9 @@ const { FileInstallationStore } = require('@slack/oauth');
 const receiver = new ExpressReceiver({
   // token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET,
-  stateSecret: 'my-secret',
+  // clientId: process.env.SLACK_CLIENT_ID,
+  // clientSecret: process.env.SLACK_CLIENT_SECRET,
+  // stateSecret: 'my-secret',
   // botId: process.env.SLACK_BOT_TOKEN,
   // appToken: process.env.SLACK_APP_TOKEN ,
   // socketMode: true,
@@ -39,6 +39,7 @@ const bodyParser = require('body-parser');
 
 const app = new App({
   receiver,
+  token: process.env.SLACK_BOT_TOKEN,
 });
 
 // app.use(bodyParser.urlencoded({ extended: true }));
@@ -85,34 +86,123 @@ app.event('app_home_opened', async ({ event, client, context }) => {
   }
 });
 
+app.action('accept_button', async ({ ack, say }) => {
+  await ack();
+  console.log('accept pressed');
+  await app.client.chat.update({
+    channel: '',
+    ts: '',
+    // text: 'Candidate accepted',
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'Candidate accepted',
+        },
+      },
+    ],
+  });
+
+  // await say('Candidate approved 👍');
+});
+
+app.action('decline_button', async ({ ack, say }) => {
+  // Acknowledge action request
+  await ack();
+  console.log('declined pressed');
+  await app.client.chat.update({
+    channel: '',
+    ts: '',
+    // text: 'Candidate accepted',
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'Candidate Declined',
+        },
+      },
+    ],
+  });
+  // await say('Candidate declined');
+});
+
+// app.event('team_join', async ({ event, client, logger }) => {
+//   try {
+//     // Call chat.postMessage with the built-in client
+//     const result = await client.chat.postMessage({
+//       channel: welcomeChannelId,
+//       text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
+//     });
+//     logger.info(result);
+//   }
+//   catch (error) {
+//     logger.error(error);
+//   }
+// });
+
 // receiver.router.use(express.json());
 receiver.router.use(bodyParser.urlencoded({ extended: true }));
 
 receiver.router.post('/get-test', (req, res) => {
   let request = req.body;
 
-  // const channelId = "C032E5YCF4J";
-  const channelId = 'C031LN082QP';
-
+  // const channelId = "C032E5YCF4J"; //lessonsup
+  const channelId = 'C039AS1FCFP'; //lessonsup Tweam
+  // const channelId = 'C031LN082QP';//kubi test lab
   try {
     // Call the chat.postMessage method using the WebClient
     const result = app.client.chat.postMessage({
-      channel: 'C031LN082QP',
-      text: req.body.message,
+      channel: channelId,
+      // text: req.body.message,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: request.message,
+          },
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Accept  :white_check_mark: ',
+              },
+              style: 'primary',
+              value: 'click_me_123',
+              action_id: 'accept_button',
+            },
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Decline  :x: ',
+              },
+              style: 'danger',
+              value: 'click_me_123',
+              action_id: 'decline_button',
+            },
+          ],
+        },
+      ],
     });
-
     console.log(result);
   } catch (error) {
     console.error(error);
   }
-  // console.log('reciever REQUEST HERE-------------',req);
-  console.log('reciever REQUEST body HERE-------------', request);
-  console.log('yay');
-  res.send('yay!');
+
+  console.log('reciever REQUEST body HERE-------------', request.message);
+  res.send('Message post was successful');
 });
 
 (async () => {
   await app.start(process.env.PORT || 3000);
-  // app.use(express.bodyParser());
   console.log('⚡️ Bolt app is running!');
 })();
