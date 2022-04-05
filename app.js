@@ -1,56 +1,17 @@
 require('dotenv').config();
-const { App, LogLevel } = require('@slack/bolt');
+const { App, LogLevel, ExpressReceiver } = require('@slack/bolt');
 const { FileInstallationStore } = require('@slack/oauth');
+const bodyParser = require('body-parser');
 
-
-const Airtable = require('airtable');
-const base = new Airtable({apiKey: process.env.AIRTABLE_API_KEY}).base('app0V3hWyGAV40fQE');
-let businessMessage = '';
-let filledMessage = '';
-/* FETCHING AIRTABLE RECORDS*/
-base('Accept/Reject Links').select({
-  maxRecords: 1,
-  view: "All",
-  fields: ["Talent Linkedin", "Talent Name","job_title", "Talent Resume Link","accept_link", "reject_link","Talent Experience", "Talent Subroles","Jobs Subroles", "Message"]
-  
-}).eachPage(function page(records, fetchNextPage) {
-  
-  records.forEach(function(record) {
-    // console.log('Retrieved Talent Name', record.get('Talent Name'));
-    // console.log('Retrieved Talent Linkedin', record.get('Talent Linkedin'));
-    //   console.log('Retrieved job_title', record.get('job_title'));
-    //   console.log('Retrieved Talent Subroles', record.get('Talent Subroles'));
-    //   console.log('Retrieved Jobs Subroles', record.get('Jobs Subroles'));
-    //   console.log('Retrieved accept_link', record.get('accept_link'));
-    //   console.log('Retrieved reject_link', record.get('reject_link'));
-    //   console.log('Retrieved Talent Resume Link', record.get('Talent Resume Link'));
-    //   console.log('Retrieved Talent Experience', record.get('Talent Experience'));
-      console.log('Retrieved Message BELOW -------------------------------------------------------------------------------------------------------');
-      console.log(typeof record.get('Message'));
-      filledMessage = record.get('Message')
-      return filledMessage;
-    });
-    console.log(businessMessage);
-    
-    // To fetch the next page of records, call `fetchNextPage`.
-    // If there are more records, `page` will get called again.
-    // If there are no more records, `done` will get called.
-    fetchNextPage();
-    
-  }, function done(err) {
-    if (err) { console.error(err); return; }
-  });
-  
-  
-  const app = new App({
-    signingSecret: process.env.SLACK_SIGNING_SECRET,
-    clientId: process.env.SLACK_CLIENT_ID,
-    clientSecret: process.env.SLACK_CLIENT_SECRET,
-    stateSecret: 'my-secret',
-    // botId: process.env.SLACK_BOT_TOKEN,
-    // appToken: process.env.SLACK_APP_TOKEN ,
-    // token: process.env.SLACK_BOT_TOKEN,
-    // socketMode: true,
+const receiver = new ExpressReceiver({
+  // token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  // clientId: process.env.SLACK_CLIENT_ID,
+  // clientSecret: process.env.SLACK_CLIENT_SECRET,
+  // stateSecret: 'my-secret',
+  // botId: process.env.SLACK_BOT_TOKEN,
+  // appToken: process.env.SLACK_APP_TOKEN ,
+  // socketMode: true,
   logLevel: LogLevel.DEBUG,
   scopes: [
     'chat:write',
@@ -68,44 +29,20 @@ base('Accept/Reject Links').select({
     'channels:history',
     'mpim:history',
     'links:read',
-    'chat:write.public'
+    'chat:write.public',
   ],
   installationStore: new FileInstallationStore(),
+  installerOptions: {
+    directInstall: false,
+  },
+});
+
+const app = new App({
+  receiver,
+  token: process.env.SLACK_BOT_TOKEN,
 });
 
 /* Add functionality here */
-
-// // ID of the channel you want to send the message to
-// const channelId = "C12345";
-
-// try {
-//   // Call the chat.postMessage method using the WebClient
-//   const result = await client.chat.postMessage({
-//     channel: channelId,
-//     text: "Hello world"
-//   });
-
-//   console.log(result);
-// }
-// catch (error) {
-//   console.error(error);
-// }
-
-
-app.message('eomjis test?!', async ({ message, client, logger }) => {
-  try {
-    // Call chat.scheduleMessage with the built-in client
-    const result = await client.admin.emoji.add({
-      name: 'testemo' ,
-      url: 'https://picsum.photos/50',
-      
-    });
-  }
-  catch (error) {
-    logger.error(error);
-  }
-});
-
 
 app.event('app_home_opened', async ({ event, client, context }) => {
   try {
@@ -113,12 +50,12 @@ app.event('app_home_opened', async ({ event, client, context }) => {
     const result = await client.views.publish({
       /* the user that opened your app's app home */
       user_id: event.user,
-      
+
       /* the view object that appears in the app home*/
       view: {
         type: 'home',
         callback_id: 'home_view',
-        
+
         /* body of the view */
         blocks: [
           {
@@ -135,7 +72,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: "3/12/22 testing update!",
+              text: '3/12/22 testing update!',
             },
           },
         ],
@@ -146,81 +83,132 @@ app.event('app_home_opened', async ({ event, client, context }) => {
   }
 });
 
-// app.message('hello', async ({ message, say }) => {
-  //   // say() sends a message to the channel where the event was triggered
-  //   await say({
-    //     blocks: [
-      //       {
-        //         "type": "section",
-        //         "text": {
-          //           "type": "mrkdwn",
-          //           "text": `Hey there <@${message.user}>!`
-          //         }
-          //       }
-          //     ],
-          //     text: `Hey there <@${message.user}>!`
-          //   });
-          // });
-          
-          
-          
-          // app.message(/^(hi|hello|hey).*/, async ({ context, say }) => {
-            //   // RegExp matches are inside of context.matches
-            //   const greeting = context.matches[0];
-            
-            //   await say(`${greeting}, how are you?`);
-            // });
-            
-            app.message('hello', async ({ message, say }) => {
-              // say() sends a message to the channel where the event was triggered
-              businessMessage = filledMessage;
-  await say({
-    blocks: [
-      {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": businessMessage
-          // "text": 'Hi <Business User First Name>, \n\nCongrats! You have a new match for *<Job Name>* \n\n*Name*: <Talent Full Name> \n:mag: *Experience*:<Talent Experience Level> \n:sparkles:*Matched because:* <Subroles> \n\n:page_facing_up:Resume (Link to Resume)    |      LinkedIn (Link to LinkedIn)  '
-        }
-      },
-      {
-        "type": "actions",
-        "elements": [
-          {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "emoji": true,
-              "text": "Accept  :white_check_mark: "
-            },
-            "style": "primary",
-            "value": "click_me_123"
+app.action('accept_button', async ({ body, ack, client, logger }) => {
+  console.log('accept pressed');
+  await ack();
+  console.log(body);
+  console.log('blocks================================', body.message.blocks);
+  console.log(
+    'ACTIONS================================',
+    body.message.blocks[1].elements[0].value
+  );
+  try {
+    const result = await client.chat.update({
+      channel: body.channel.id,
+      ts: body.message.ts,
+      // text: 'Candidate accepted',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: body.message.blocks[1].elements[0].value,
           },
-          {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "emoji": true,
-              "text": "Decline  :x: "
-            },
-            "style": "danger",
-            "value": "click_me_123"
-          }
-        ]
-      }
-    ],
-    "text": businessMessage
-    // "text": "Hi <Business User First Name>, \n\nCongrats! You have a new match for *<Job Name>* \n\n*Name*: <Talent Full Name> \n:mag: *Experience*:<Talent Experience Level> \n:sparkles:*Matched because:* <Subroles> \n\n:page_facing_up:Resume (Link to Resume)    |      LinkedIn (Link to LinkedIn)  "
-  });
+        },
+      ],
+    });
+    logger.info(result);
+  } catch (error) {
+    logger.error(error);
+  }
 });
 
+app.action('decline_button', async ({ body, ack, client, logger }) => {
+  // Acknowledge action request
+  await ack();
+  console.log('declined pressed');
 
+  console.log(body);
+  console.log('blocks================================', body.message.blocks);
+  console.log(
+    'ACTIONS================================',
+    body.message.blocks[1].elements[0].value
+  );
 
+  try {
+    const result = await client.chat.update({
+      channel: body.channel.id,
+      ts: body.message.ts,
+      // text: 'Candidate declined',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: body.message.blocks[1].elements[1].value,
+          },
+        },
+      ],
+    });
+    logger.info(result);
+  } catch (error) {
+    logger.error(error);
+  }
+});
+
+receiver.router.use(bodyParser.urlencoded({ extended: true }));
+
+receiver.router.post('/business-matches', (req, res) => {
+  let request = req.body;
+
+  // const chaqnnelId = "C032E5YCF4J"; //lessonsup
+  const channelId = 'C039AS1FCFP'; //lessonsup Tweam
+  // const channelId = 'C031LN082QP';//kubi test
+
+  try {
+    // Call the chat.postMessage method using the WebClient
+    const result = app.client.chat.postMessage({
+      channel: request.channel_id,
+      // text: req.body.message,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: request.message,
+          },
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Accept  :white_check_mark: ',
+              },
+              style: 'primary',
+              value: request.slack_accepted_message,
+              action_id: 'accept_button',
+              url: request.accept_link,
+            },
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Decline  :x: ',
+              },
+              style: 'danger',
+              value: request.slack_rejected_message,
+              action_id: 'decline_button',
+              url: request.reject_link,
+            },
+          ],
+        },
+      ],
+    });
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+
+  console.log('reciever REQUEST body HERE-------------', request.message);
+  res.send('Message post was successful');
+});
 
 (async () => {
-  // Start the app
   await app.start(process.env.PORT || 3000);
-
   console.log('⚡️ Bolt app is running!');
 })();
