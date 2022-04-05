@@ -1,6 +1,8 @@
 require('dotenv').config();
 const { App, LogLevel, ExpressReceiver } = require('@slack/bolt');
 const { FileInstallationStore } = require('@slack/oauth');
+const bodyParser = require('body-parser');
+
 const receiver = new ExpressReceiver({
   // token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -34,16 +36,12 @@ const receiver = new ExpressReceiver({
     directInstall: false,
   },
 });
-const express = require('express');
-const bodyParser = require('body-parser');
 
 const app = new App({
   receiver,
   token: process.env.SLACK_BOT_TOKEN,
 });
 
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(express.json());
 
 /* Add functionality here */
 
@@ -86,71 +84,75 @@ app.event('app_home_opened', async ({ event, client, context }) => {
   }
 });
 
-app.action('accept_button', async ({ ack, say }) => {
-  await ack();
-  console.log('accept pressed');
-  await app.client.chat.update({
-    channel: '',
-    ts: '',
-    // text: 'Candidate accepted',
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'Candidate accepted',
-        },
-      },
-    ],
-  });
 
-  // await say('Candidate approved 👍');
+app.action('accept_button', async ({ body, ack, client, logger }) => {
+  console.log('accept pressed');
+  await ack();
+console.log(body);
+console.log('blocks================================',body.message.blocks);
+console.log('ACTIONS================================',body.message.blocks[1].elements[0].value);
+try {
+    const result = await client.chat.update({
+      channel: body.channel.id,
+      ts: body.message.ts,
+      // text: 'Candidate accepted',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: body.message.blocks[1].elements[0].value,
+          },
+        },
+      ],
+    });
+    logger.info(result);
+  } catch (error) {
+    logger.error(error);
+  }
 });
 
-app.action('decline_button', async ({ ack, say }) => {
+app.action('decline_button', async ({ body, ack, client, logger }) => {
   // Acknowledge action request
   await ack();
   console.log('declined pressed');
-  await app.client.chat.update({
-    channel: '',
-    ts: '',
-    // text: 'Candidate accepted',
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'Candidate Declined',
+
+  console.log(body);
+console.log('blocks================================',body.message.blocks);
+console.log('ACTIONS================================',body.message.blocks[1].elements[0].value);
+
+  try {
+    const result = await client.chat.update({
+      channel: body.channel.id,
+      ts: body.message.ts,
+      // text: 'Candidate declined',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: body.message.blocks[1].elements[1].value,
+          },
         },
-      },
-    ],
-  });
-  // await say('Candidate declined');
+      ],
+    });
+    logger.info(result);
+  } catch (error) {
+    logger.error(error);
+  }
 });
 
-// app.event('team_join', async ({ event, client, logger }) => {
-//   try {
-//     // Call chat.postMessage with the built-in client
-//     const result = await client.chat.postMessage({
-//       channel: welcomeChannelId,
-//       text: `Welcome to the team, <@${event.user.id}>! 🎉 You can introduce yourself in this channel.`
-//     });
-//     logger.info(result);
-//   }
-//   catch (error) {
-//     logger.error(error);
-//   }
-// });
 
-// receiver.router.use(express.json());
+
 receiver.router.use(bodyParser.urlencoded({ extended: true }));
 
-receiver.router.post('/get-test', (req, res) => {
+receiver.router.post('/business-matches', (req, res) => {
   let request = req.body;
 
-  // const channelId = "C032E5YCF4J"; //lessonsup
+  // const chaqnnelId = "C032E5YCF4J"; //lessonsup
   const channelId = 'C039AS1FCFP'; //lessonsup Tweam
-  // const channelId = 'C031LN082QP';//kubi test lab
+  // const channelId = 'C031LN082QP';//kubi test 
+  
   try {
     // Call the chat.postMessage method using the WebClient
     const result = app.client.chat.postMessage({
@@ -175,8 +177,9 @@ receiver.router.post('/get-test', (req, res) => {
                 text: 'Accept  :white_check_mark: ',
               },
               style: 'primary',
-              value: 'click_me_123',
+              value:request.slack_accepted_message,
               action_id: 'accept_button',
+              // url: request.accept_link,
             },
             {
               type: 'button',
@@ -186,8 +189,9 @@ receiver.router.post('/get-test', (req, res) => {
                 text: 'Decline  :x: ',
               },
               style: 'danger',
-              value: 'click_me_123',
+              value: request.slack_rejected_message,
               action_id: 'decline_button',
+              // url: request.reject_link,
             },
           ],
         },
