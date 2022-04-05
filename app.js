@@ -42,7 +42,6 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
 });
 
-
 /* Add functionality here */
 
 app.event('app_home_opened', async ({ event, client, context }) => {
@@ -84,14 +83,16 @@ app.event('app_home_opened', async ({ event, client, context }) => {
   }
 });
 
-
 app.action('accept_button', async ({ body, ack, client, logger }) => {
   console.log('accept pressed');
   await ack();
-console.log(body);
-console.log('blocks================================',body.message.blocks);
-console.log('ACTIONS================================',body.message.blocks[1].elements[0].value);
-try {
+  console.log(body);
+  console.log('blocks================================', body.message.blocks);
+  console.log(
+    'ACTIONS================================',
+    body.message.blocks[1].elements[0].value
+  );
+  try {
     const result = await client.chat.update({
       channel: body.channel.id,
       ts: body.message.ts,
@@ -118,8 +119,11 @@ app.action('decline_button', async ({ body, ack, client, logger }) => {
   console.log('declined pressed');
 
   console.log(body);
-console.log('blocks================================',body.message.blocks);
-console.log('ACTIONS================================',body.message.blocks[1].elements[0].value);
+  console.log('blocks================================', body.message.blocks);
+  console.log(
+    'ACTIONS================================',
+    body.message.blocks[1].elements[0].value
+  );
 
   try {
     const result = await client.chat.update({
@@ -142,8 +146,6 @@ console.log('ACTIONS================================',body.message.blocks[1].ele
   }
 });
 
-
-
 receiver.router.use(bodyParser.urlencoded({ extended: true }));
 
 receiver.router.post('/business-matches', (req, res) => {
@@ -151,12 +153,12 @@ receiver.router.post('/business-matches', (req, res) => {
 
   // const chaqnnelId = "C032E5YCF4J"; //lessonsup
   const channelId = 'C039AS1FCFP'; //lessonsup Tweam
-  // const channelId = 'C031LN082QP';//kubi test 
-  
+  // const channelId = 'C031LN082QP';//kubi test
+
   try {
     // Call the chat.postMessage method using the WebClient
     const result = app.client.chat.postMessage({
-      channel: channelId,
+      channel: request.channel_id,
       // text: req.body.message,
       blocks: [
         {
@@ -177,9 +179,9 @@ receiver.router.post('/business-matches', (req, res) => {
                 text: 'Accept  :white_check_mark: ',
               },
               style: 'primary',
-              value:request.slack_accepted_message,
+              value: request.slack_accepted_message,
               action_id: 'accept_button',
-              // url: request.accept_link,
+              url: request.accept_link,
             },
             {
               type: 'button',
@@ -191,7 +193,7 @@ receiver.router.post('/business-matches', (req, res) => {
               style: 'danger',
               value: request.slack_rejected_message,
               action_id: 'decline_button',
-              // url: request.reject_link,
+              url: request.reject_link,
             },
           ],
         },
