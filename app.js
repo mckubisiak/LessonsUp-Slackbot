@@ -208,6 +208,72 @@ receiver.router.post('/business-matches', (req, res) => {
   res.send('Message post was successful');
 });
 
+receiver.router.post('/test/business-matches', (req, res) => {
+  let request = req.body;
+
+  // const chaqnnelId = "C032E5YCF4J"; //lessonsup
+  const channelId = 'C039AS1FCFP'; //lessonsup Tweam
+  // const channelId = 'C031LN082QP';//kubi test
+
+  try {
+    // Call the chat.postMessage method using the WebClient
+    const result = app.client.chat.postMessage({
+      channel: channelId,
+      // text: req.body.message,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'This is a test message, links & interactivity are disabled',
+          },
+        },{
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: request.message,
+          },
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Accept  :white_check_mark: ',
+              },
+              style: 'primary',
+              value: request.slack_accepted_message,
+              action_id: 'test_accept_button',
+              // url: request.accept_link,
+            },
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Decline  :x: ',
+              },
+              style: 'danger',
+              value: request.slack_rejected_message,
+              action_id: 'test_decline_button',
+              // url: request.reject_link,
+            },
+          ],
+        },
+      ],
+    });
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+
+  console.log('reciever REQUEST body HERE-------------', request.message);
+  res.send('Message post was successful');
+});
+
 (async () => {
   await app.start(process.env.PORT || 3000);
   console.log('⚡️ Bolt app is running!');
