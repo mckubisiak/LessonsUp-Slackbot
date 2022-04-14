@@ -1,10 +1,7 @@
 require('dotenv').config();
 const { App, LogLevel } = require('@slack/bolt');
 const { FileInstallationStore } = require('@slack/oauth');
-const bodyParser = require('body-parser');
-const express = require('express');
 const { parse } = require('querystring');
-const getRawBody = require('raw-body');
 
 const app = new App({
   // token: process.env.SLACK_BOT_TOKEN,
@@ -43,20 +40,24 @@ const app = new App({
       path: '/get-test',
       method: ['POST'],
       handler: async (req, res) => {
-        const rawBody = await getRawBody(req);
-        const body = parse(rawBody.toString());
-        console.log(body); // id is one of the parameters that arrives in the body
-        // let request = JSON.parse(req.body);
-        //   let payload = {
-        //     "message": request.message,
-        //     "accept_link": request.accept_link,
-        //     "reject_link": request.reject_link
+        // const rawBody = await getRawBody(req);
+        // const body = parse(rawBody.toString());
+        // console.log(body);
+        // res.writeHead(200);
+        // res.end('res end');
+        
+        let body = '';
+        req.on('data', buffer => {
+          body += decodeURIComponent(buffer.toString());
+          // console.log(body);
 
-        // }
-        res.writeHead(200);
-        // console.log(req);
-        // console.log('ROUTE REQUEST body HERE-------------', req.body);
-        res.end('res end');
+        });
+        req.on('end', async () => {
+          const result = parse(body);
+          console.log('result', result);
+          res.writeHead(200);
+          res.end();
+        });
       },
     },
   ],
