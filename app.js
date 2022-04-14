@@ -1,8 +1,10 @@
 require('dotenv').config();
 const { App, LogLevel } = require('@slack/bolt');
 const { FileInstallationStore } = require('@slack/oauth');
-// const bodyParser = require('body-parser');
-// const express = require('express');
+const bodyParser = require('body-parser');
+const express = require('express');
+const { parse } = require('querystring');
+const getRawBody = require('raw-body');
 
 const app = new App({
   // token: process.env.SLACK_BOT_TOKEN,
@@ -40,32 +42,28 @@ const app = new App({
     {
       path: '/get-test',
       method: ['POST'],
-      handler: (req, res) => {
-        // app.use(express.urlencoded({ extended: false }));
-        // app.use(express.json());
-      
+      handler: async (req, res) => {
+        const rawBody = await getRawBody(req);
+        const body = parse(rawBody.toString());
+        console.log(body); // id is one of the parameters that arrives in the body
         // let request = JSON.parse(req.body);
         //   let payload = {
-          //     "message": request.message,
-          //     "accept_link": request.accept_link,
-          //     "reject_link": request.reject_link
-          
-          // }
-          res.writeHead(200);
-          console.log(req);
-          
-          // console.log('ROUTE REQUEST HERE-------------', req);
-          console.log('ROUTE REQUEST body HERE-------------', req.body);
-          // console.log('parsed REQUEST body HERE-------------', request);
-          res.end('res end');
-        },
+        //     "message": request.message,
+        //     "accept_link": request.accept_link,
+        //     "reject_link": request.reject_link
+
+        // }
+        res.writeHead(200);
+        // console.log(req);
+        // console.log('ROUTE REQUEST body HERE-------------', req.body);
+        res.end('res end');
       },
-    ],
-  });
-  
-  
-  app.use(express.urlencoded({extended: false}));
-  app.use(express.json());
+    },
+  ],
+});
+
+// app.use(express.urlencoded({extended: true}));
+// app.use(express.json());
 
 /* Add functionality here */
 
