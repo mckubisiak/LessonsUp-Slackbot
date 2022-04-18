@@ -49,7 +49,6 @@ const app = new App({
         let body = '';
         req.on('data', buffer => {
           body += decodeURIComponent(buffer.toString());
-          // console.log(body);
 
         });
         req.on('end', async () => {
