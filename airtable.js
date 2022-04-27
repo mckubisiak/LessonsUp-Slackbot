@@ -23,7 +23,7 @@ base('Accept/Reject Links').select({
     //   console.log('Retrieved Talent Experience', record.get('Talent Experience'));
       // console.log('Retrieved Message BELOW -------------------------------------------------------------------------------------------------------');
       // console.log(typeof record.get('Message'));
-      // filledMessage = record.get('Message')
+      filledMessage = record.get('Message')
       return filledMessage;
     });
     console.log(businessMessage);
@@ -35,4 +35,25 @@ base('Accept/Reject Links').select({
     
   }, function done(err) {
     if (err) { console.error(err); return; }
+  });
+
+  base('Business Messages').update([
+    {
+      "id": "rectDZVYJWhR5kXn7",// NEEDS UPDATE TO DYNAMIC
+      "fields": {
+        "slack_message_timestamp": [
+          "recZvno7b0weQa2Mv" // NEEDS UPDATE TO DYNAMIC
+        ],
+      }
+    },
+    
+    
+  ], function(err, records) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    records.forEach(function(record) {
+      console.log(record.get('slack_message_timestamp'));
+    });
   });
