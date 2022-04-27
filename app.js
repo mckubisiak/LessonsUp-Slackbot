@@ -179,12 +179,12 @@ receiver.router.post('/business-matches', async (req, res) => {
     talentResponse1 + '\n\n' + talentResponse2 + '\n\n' + talentResponse3;
 
   console.log(businessMessageLeft);
-  console.log(businessMessageRight);
+  console.log(request.sending_slack_channel);
 
   try {
     // Call the chat.postMessage method using the WebClient
     const result = await app.client.chat.postMessage({
-      channel: request.sending_slack_channel,
+      channel: request.channel_id,
       // text: req.body.message,
       blocks: [
         {
@@ -260,7 +260,7 @@ receiver.router.post('/business-matches', async (req, res) => {
             {
               id: request.business_message_id,
               fields: {
-                slack_test_timestamp: result.ts,
+                slack_message_timestamp: result.ts,
               },
             },
           ],
