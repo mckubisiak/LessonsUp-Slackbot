@@ -62,7 +62,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: "<https://www.lessonsup.com/ | *Lessonsup*>",
+              text: '<https://www.lessonsup.com/ | *Lessonsup*>',
             },
           },
           // {
@@ -85,7 +85,9 @@ app.event('app_home_opened', async ({ event, client, context }) => {
 
 app.action('accept_button', async ({ body, ack, client, logger }) => {
   await ack();
-
+  // console.log(body);
+  console.log(body.actions);
+  console.log(body.actions[0].value);
   try {
     const result = await client.chat.update({
       channel: body.channel.id,
@@ -96,7 +98,7 @@ app.action('accept_button', async ({ body, ack, client, logger }) => {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: body.message.blocks[1].elements[0].value,
+            text: body.actions[0].value,
           },
         },
       ],
@@ -120,7 +122,7 @@ app.action('decline_button', async ({ body, ack, client, logger }) => {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: body.message.blocks[1].elements[1].value,
+            text: body.actions[0].value,
           },
         },
       ],
@@ -303,7 +305,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: body.message.blocks[1].elements[0].value,
+              text: request.slack_accepted_message,
             },
           },
         ],
@@ -315,15 +317,15 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   } else if (businessResponse === 'rejected') {
     try {
       const result = await client.chat.update({
-        channel: body.channel.id,
-        ts: body.message.ts,
+        channel: channelId,
+        ts: messageTs,
         // text: 'Candidate declined',
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: body.message.blocks[1].elements[1].value,
+              text: request.slack_rejected_message,
             },
           },
         ],
