@@ -3,6 +3,7 @@ const { App, LogLevel, ExpressReceiver } = require('@slack/bolt');
 const { FileInstallationStore } = require('@slack/oauth');
 const bodyParser = require('body-parser');
 const Airtable = require('airtable');
+const { ConsoleLogger } = require('@slack/logger');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
   'app0V3hWyGAV40fQE'
 );
@@ -314,7 +315,8 @@ receiver.router.post('/business-matches/response', async (req, res) => {
       });
       console.log('RESULTS HERE =====================================', result);
     } catch (error) {
-      error(error);
+      ConsoleLogger(error);
+      console.log(error);
     }
   } else if (businessResponse === 'reject') {
     try {
@@ -334,7 +336,8 @@ receiver.router.post('/business-matches/response', async (req, res) => {
       });
       console.log('RESULTS HERE =====================================', result);
     } catch (error) {
-      error(error);
+      ConsoleLogger(error);
+      console.log(error);
     }
   }
 
