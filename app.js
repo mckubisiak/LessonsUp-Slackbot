@@ -14,7 +14,7 @@ const receiver = new ExpressReceiver({
   // clientSecret: process.env.SLACK_CLIENT_SECRET,
   // stateSecret: 'my-secret',
   // botId: process.env.SLACK_BOT_TOKEN,
-  // appToken: process.env.SLACK_APP_TOKEN ,
+  // appToken: process.env.SLACK_APP_TOKEN,
   // socketMode: true,
   logLevel: LogLevel.DEBUG,
   scopes: [
@@ -133,8 +133,7 @@ app.action('decline_button', async ({ body, ack, client, logger }) => {
   }
 });
 
-receiver.router.use(bodyParser.urlencoded({ extended: true }));
-//custome recievers must be below for proper paring
+receiver.router.use(bodyParser.urlencoded({ extended: true }));//custom recievers must be below for proper paring
 
 receiver.router.post('/business-matches', async (req, res) => {
   const request = req.body;
@@ -292,7 +291,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
 
   const channelId = request.sending_slack_channel;
   const messageTs = request.slack_message_timestamp;
-  const businessResponse = request.bussiness_response;
+  const businessResponse = request.business_response;
 
   if (businessResponse === 'accept') {
     try {
@@ -310,6 +309,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
           },
         ],
       });
+      console.log(result);
       logger.info(result);
     } catch (error) {
       logger.error(error);
@@ -330,6 +330,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
           },
         ],
       });
+      console.log(result);
       logger.info(result);
     } catch (error) {
       logger.error(error);
