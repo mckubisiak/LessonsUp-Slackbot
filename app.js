@@ -294,49 +294,32 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   const businessResponse = request.business_response;
   console.log('REQUEST BODY HERE =====================================', request);
   if (businessResponse === 'accept') {
-    try {
-      const result = await client.chat.update({
-        channel: channelId,
-        ts: messageTs,
-        // text: 'Candidate accepted',
-        blocks: [
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: request.slack_accepted_message,
-            },
-          },
-        ],
-      });
-      console.log('RESULTS HERE =====================================', result);
-      logger.info(result);
-    } catch (error) {
-      logger.error(error);
-    }
+    const updatedMessage = request.slack_accepted_message;
+    return updatedMessage;
   } else if (businessResponse === 'rejected') {
-    try {
-      const result = await client.chat.update({
-        channel: channelId,
-        ts: messageTs,
-        // text: 'Candidate declined',
-        blocks: [
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: request.slack_rejected_message,
-            },
-          },
-        ],
-      });
-      console.log('RESULTS HERE =====================================', result);
-      logger.info(result);
-    } catch (error) {
-      logger.error(error);
-    }
+    const updatedMessage = request.slack_rejected_message;
+    return updatedMessage;
   }
-
+  try {
+    const result = await client.chat.update({
+      channel: channelId,
+      ts: messageTs,
+      // text: 'Candidate accepted',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: updatedMessage,
+          },
+        },
+      ],
+    });
+    console.log('RESULTS HERE =====================================', result);
+    logger.info(result);
+  } catch (error) {
+    logger.error(error);
+  }
   res.send('Message was updated ');
 });
 
