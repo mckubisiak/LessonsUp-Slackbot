@@ -299,7 +299,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   console.log('REQUEST BODY HERE =====================================', request);
   if (businessResponse === 'accept') {
     try {
-      const result = await client.chat.update({
+      const result = await app.client.chat.update({
         channel: channelId,
         ts: messageTs,
         // text: 'Candidate accepted',
@@ -319,7 +319,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
     }
   } else if (businessResponse === 'reject') {
     try {
-      const result = await client.chat.update({
+      const result = await app.client.chat.update({
         channel: channelId,
         ts: messageTs,
         // text: 'Candidate declined',
