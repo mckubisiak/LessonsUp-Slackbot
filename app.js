@@ -133,7 +133,7 @@ app.action('decline_button', async ({ body, ack, client, logger }) => {
   }
 });
 
-receiver.router.use(bodyParser.urlencoded({ extended: true }));//custom recievers must be below for proper paring
+receiver.router.use(bodyParser.urlencoded({ extended: true })); //custom recievers must be below for proper paring
 
 receiver.router.post('/business-matches', async (req, res) => {
   const request = req.body;
@@ -292,14 +292,14 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   const channelId = request.sending_slack_channel;
   const messageTs = request.slack_message_timestamp;
   const businessResponse = request.business_response;
-  if (businessResponse === 'accept') {
-    const updatedMessage = request.slack_accepted_message;
-    return updatedMessage;
-  } else if (businessResponse === 'rejected') {
-    const updatedMessage = request.slack_rejected_message;
-    return updatedMessage;
-  }
+
   try {
+    let updatedMessage = '';
+    if (businessResponse === 'accept') {
+      updatedMessage = request.slack_accepted_message;
+    } else if (businessResponse === 'rejected') {
+      updatedMessage = request.slack_rejected_message;
+    }
     const result = await client.chat.update({
       channel: channelId,
       ts: messageTs,
