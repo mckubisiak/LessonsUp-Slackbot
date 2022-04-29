@@ -294,14 +294,8 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   const businessResponse = request.business_response;
   const acceptMessage = request.slack_accepted_message;
   const rejectMessage= request.slack_rejected_message;
-  let updatedMessage = '';
+  
   console.log('REQUEST BODY HERE =====================================', request);
-
-
-
- 
-
-
   if (businessResponse === 'accept') {
     try {
       const result = await client.chat.update({
