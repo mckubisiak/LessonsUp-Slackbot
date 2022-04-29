@@ -292,7 +292,6 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   const channelId = request.sending_slack_channel;
   const messageTs = request.slack_message_timestamp;
   const businessResponse = request.business_response;
-  console.log('REQUEST BODY HERE =====================================', request);
   if (businessResponse === 'accept') {
     const updatedMessage = request.slack_accepted_message;
     return updatedMessage;
@@ -300,6 +299,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
     const updatedMessage = request.slack_rejected_message;
     return updatedMessage;
   }
+  console.log(updatedMessage);
   try {
     const result = await client.chat.update({
       channel: channelId,
