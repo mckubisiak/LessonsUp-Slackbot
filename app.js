@@ -315,7 +315,6 @@ receiver.router.post('/business-matches/response', async (req, res) => {
       });
       console.log('RESULTS HERE =====================================', result);
     } catch (error) {
-      ConsoleLogger(error);
       console.log(error);
     }
   } else if (businessResponse === 'reject') {
@@ -336,7 +335,6 @@ receiver.router.post('/business-matches/response', async (req, res) => {
       });
       console.log('RESULTS HERE =====================================', result);
     } catch (error) {
-      ConsoleLogger(error);
       console.log(error);
     }
   }
