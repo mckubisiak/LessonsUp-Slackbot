@@ -292,9 +292,9 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   const channelId = request.sending_slack_channel;
   const messageTs = request.slack_message_timestamp;
   const businessResponse = request.business_response;
+  let updatedMessage = '';
 
   try {
-    let updatedMessage = '';
     if (businessResponse === 'accept') {
       updatedMessage = request.slack_accepted_message;
     } else if (businessResponse === 'rejected') {
