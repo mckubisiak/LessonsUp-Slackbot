@@ -299,7 +299,6 @@ receiver.router.post('/business-matches/response', async (req, res) => {
     const updatedMessage = request.slack_rejected_message;
     return updatedMessage;
   }
-  console.log(updatedMessage);
   try {
     const result = await client.chat.update({
       channel: channelId,
