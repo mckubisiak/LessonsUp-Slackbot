@@ -317,12 +317,12 @@ receiver.router.post('/business-matches/response', async (req, res) => {
     } catch (error) {
       console.log(error);
     }
-  } else if (businessResponse === 'reject') {
+  } else  {
     try {
       const result = await app.client.chat.update({
         channel: channelId,
         ts: messageTs,
-        // text: 'Candidate declined',
+        // text: 'Candidate accepted',
         blocks: [
           {
             type: 'section',
