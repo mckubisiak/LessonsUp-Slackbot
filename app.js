@@ -133,7 +133,7 @@ app.action('decline_button', async ({ body, ack, client, logger }) => {
   }
 });
 
-receiver.router.use(bodyParser.urlencoded({ extended: true })); //custom recievers must be below for proper paring
+receiver.router.use(bodyParser.urlencoded({ extended: true }));//custom recievers must be below for proper paring
 
 receiver.router.post('/business-matches', async (req, res) => {
   const request = req.body;
@@ -292,33 +292,54 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   const channelId = request.sending_slack_channel;
   const messageTs = request.slack_message_timestamp;
   const businessResponse = request.business_response;
-  let updatedMessage = '';
+  const acceptMessage = request.slack_accepted_message;
+  const rejectMessage= request.slack_rejected_message;
 
-  try {
-    if (businessResponse === 'accept') {
-      updatedMessage = request.slack_accepted_message;
-    } else if (businessResponse === 'rejected') {
-      updatedMessage = request.slack_rejected_message;
-    }
-    const result = await client.chat.update({
-      channel: channelId,
-      ts: messageTs,
-      // text: 'Candidate accepted',
-      blocks: [
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: updatedMessage,
+  console.log('REQUEST BODY HERE =====================================', request);
+  if (businessResponse === 'accept') {
+    try {
+      const result = await client.chat.update({
+        channel: channelId,
+        ts: messageTs,
+        // text: 'Candidate accepted',
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: acceptMessage,
+            },
           },
-        },
-      ],
-    });
-    console.log('RESULTS HERE =====================================', result);
-    logger.info(result);
-  } catch (error) {
-    logger.error(error);
+        ],
+      });
+      console.log('RESULTS HERE =====================================', result);
+      logger.info(result);
+    } catch (error) {
+      logger.error(error);
+    }
+  } else if (businessResponse === 'rejected') {
+    try {
+      const result = await client.chat.update({
+        channel: channelId,
+        ts: messageTs,
+        // text: 'Candidate declined',
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: rejectMessage,
+            },
+          },
+        ],
+      });
+      console.log('RESULTS HERE =====================================', result);
+      logger.info(result);
+    } catch (error) {
+      logger.error(error);
+    }
   }
+
   res.send('Message was updated ');
 });
 
