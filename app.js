@@ -253,7 +253,7 @@ receiver.router.post('/business-matches', async (req, res) => {
         },
       ],
     });
-    console.log(result);
+    console.log('RESULTS HERE =====================================', result);
     (async () => {
       try {
         base('Business Messages').update(
@@ -292,7 +292,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
   const channelId = request.sending_slack_channel;
   const messageTs = request.slack_message_timestamp;
   const businessResponse = request.business_response;
-
+  console.log('REQUEST BODY HERE =====================================', request);
   if (businessResponse === 'accept') {
     try {
       const result = await client.chat.update({
@@ -309,7 +309,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
           },
         ],
       });
-      console.log(result);
+      console.log('RESULTS HERE =====================================', result);
       logger.info(result);
     } catch (error) {
       logger.error(error);
@@ -330,7 +330,7 @@ receiver.router.post('/business-matches/response', async (req, res) => {
           },
         ],
       });
-      console.log(result);
+      console.log('RESULTS HERE =====================================', result);
       logger.info(result);
     } catch (error) {
       logger.error(error);
